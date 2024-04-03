@@ -33,16 +33,20 @@ type shortenUrlRequest struct {
 func (r *Router) CreateShortenedUrl(ctx *gin.Context){
 	var reqJson shortenUrlRequest;
 
+	// Get the user id from the context
 	userID := ctx.MustGet(constants.USER_KEY).(uint);
 
+	// Parse the request body
 	if err := ctx.ShouldBindJSON(&reqJson); err != nil {
 		log.Print(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
+	// Create a hash from the URL
 	hashedUrl := r.createHash(reqJson.Url);
 
+	// Add the shortened url and get it from the db
 	shortenedUrl, err := r.Db.CreateURL(hashedUrl, reqJson.Url, userID);
 
 	if err != nil {
@@ -50,12 +54,15 @@ func (r *Router) CreateShortenedUrl(ctx *gin.Context){
 		return
 	}
 
+	// Return the shortened URL
 	ctx.JSON(http.StatusOK, gin.H{"url": shortenedUrl});
 }
 
 func (r *Router) GetShortenedUrl(ctx *gin.Context){
+	// Get hashed url from the param
 	hash := ctx.Param("hash");
 
+	// Check db and get the URL struct which has the long and short URL
 	url, err := r.Db.GetURL(hash);
 
 	if err != nil {
@@ -63,12 +70,13 @@ func (r *Router) GetShortenedUrl(ctx *gin.Context){
 		return
 	}
 
+	// If the URL exists, redirect to the long URL
 	ctx.Redirect(http.StatusMovedPermanently, url.LongURL);
 }
 
 func (r *Router) SignUp(ctx *gin.Context){
+	// Parse the request body
 	var reqJson authUser;
-
 	if err := ctx.ShouldBindJSON(&reqJson); err != nil {
 		log.Print(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
@@ -83,11 +91,13 @@ func (r *Router) SignUp(ctx *gin.Context){
 
 	_, err := r.Db.GetUser(reqJson.Username);
 
+	// Check if the user already exists
 	if err != gorm.ErrRecordNotFound {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "User already exists"})
 		return
 	}
 
+	// Generates a hashed password
 	hashedBytes, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost);
 
 	if err != nil {
@@ -95,8 +105,10 @@ func (r *Router) SignUp(ctx *gin.Context){
 		return
 	}
 
+	// Convert bytes to string
 	hashedPassword := string(hashedBytes);
 
+	// Create a user
 	user, err := r.Db.CreateUser(reqJson.Username, hashedPassword);
 
 	if err != nil {
@@ -107,6 +119,7 @@ func (r *Router) SignUp(ctx *gin.Context){
 	jwtSecret := os.Getenv("JWT_SECRET");
 	expireToken := time.Now().Add(time.Hour * 24).Unix()
 
+	// Create a token with the user id, username and a 24 hour expiration time
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id": user.ID,
 		"username": user.Email,
@@ -124,6 +137,7 @@ func (r *Router) SignUp(ctx *gin.Context){
 }
 
 func (r *Router) Login(ctx *gin.Context){
+	// Parse the request body
 	var reqJson authUser;
 
 	if err := ctx.ShouldBindJSON(&reqJson); err != nil {
@@ -138,6 +152,7 @@ func (r *Router) Login(ctx *gin.Context){
 		return
 	}
 
+	// Check if the user exists
 	user, err := r.Db.GetUser(reqJson.Username);
 
 	if err == gorm.ErrRecordNotFound {
@@ -145,6 +160,7 @@ func (r *Router) Login(ctx *gin.Context){
 		return
 	}
 
+	// Compare the hashed password with the password in the request
 	hashErr := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(reqJson.Password));
 
 	if hashErr != nil {
@@ -155,6 +171,7 @@ func (r *Router) Login(ctx *gin.Context){
 	jwtSecret := os.Getenv("JWT_SECRET");
 	expireToken := time.Now().Add(time.Hour * 24).Unix()
 
+	// Create a token with the user id, username and a 24 hour expiration time
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id": user.ID,
 		"username": user.Email,
@@ -168,6 +185,7 @@ func (r *Router) Login(ctx *gin.Context){
 		return
 	}
 
+	// Return the token
 	ctx.JSON(http.StatusOK, gin.H{"token": tokenString});
 }
 
@@ -176,6 +194,7 @@ func (r *Router) createHash(url string) string {
 	var urlRecord db.URL;
 
     for {
+		// Create a SHA256 hash of the URL and take the first 10 characters
         hasher := crypto.SHA256.New()
         hasher.Write([]byte(url))
         hash = hex.EncodeToString(hasher.Sum(nil))[:10]
