@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+	"strconv"
 	"github.com/alperdegre/go-url-shortener/db"
 	"github.com/alperdegre/go-url-shortener/routes"
 	constants "github.com/alperdegre/go-url-shortener/util"
@@ -23,12 +23,6 @@ func main(){
 
 	if envErr != nil {
 		log.Fatal();
-	}
-
-	port := os.Getenv("PORT");
-
-	if port == "" {
-		log.Fatal("PORT env variable is not set");
 	}
 
 	// Initializes db and gets the pointer to the gorm.DB instance
@@ -68,11 +62,13 @@ func main(){
 	{
 		api.Use(AuthMiddleware)
 		{
+			api.GET("/get", app.router.GetURLs)
 			api.POST("/shorten", app.router.CreateShortenedUrl)
+			api.POST("/delete/:urlID", app.router.DeleteUrl)
 		}
 	}
 
-	router.Run();
+	router.Run(":3000");
 }
 
 // AuthMiddleware checks the Authorization header and validates the JWT token
@@ -93,11 +89,11 @@ func AuthMiddleware(ctx *gin.Context){
 	}
 
 	// Parses the token and validates it
-	parsed, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+	parsed, err := jwt.ParseWithClaims(token, &routes.CustomJWTClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("there was an error while parsing the token")
 		}
-
+	
 		return []byte(jwtSecret), nil
 	})
 
@@ -114,22 +110,21 @@ func AuthMiddleware(ctx *gin.Context){
 	}
 
 	// Gets the claims out of parsed token
-	claims, ok := parsed.Claims.(jwt.MapClaims)
+	claims, ok := parsed.Claims.(*routes.CustomJWTClaims)
 
 	if !ok {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		ctx.Abort();
+		ctx.Abort()
 		return
 	}
 
-	// Checks the id claim, converts it to uint and sets it to the context
-	if id, ok := claims["id"].(float64); ok {
-		userId := uint(id)
-		ctx.Set(constants.USER_KEY, userId);
-		ctx.Next();
-	} else {
+	userId, err := strconv.ParseUint(claims.Id, 10, 64)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-		ctx.Abort();
+		ctx.Abort()
 		return
 	}
+	
+	ctx.Set(constants.USER_KEY, uint(userId))
+	ctx.Next()
 }
