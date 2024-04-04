@@ -1,8 +1,11 @@
 package db
 
 import (
+	"fmt"
 	"log"
 	"os"
+	"time"
+
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -40,15 +43,19 @@ func InitDB() (*gorm.DB, error) {
 	}
 
 	// Connect to the postgres DB using GORM
-	gormDb, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: dbConnectionString,
-	}), &gorm.Config{})
-
-	if err != nil {
-		log.Fatal(err)
+	for i := 0; i < 3; i++ {
+		gormDb, err := gorm.Open(postgres.New(postgres.Config{
+			DSN: dbConnectionString,
+		}), &gorm.Config{})
+		if err == nil {
+			return gormDb, nil
+		}
+		fmt.Printf("[%d/3] - Error connecting to DB, retrying in 5 seconds...\n", i + 1);
+		time.Sleep(5 * time.Second)
 	}
 
-	return gormDb, nil
+	log.Fatal("Error connecting to DB");
+	return nil, nil
 }
 
 func (db *DB) TryMigrations() {
@@ -95,7 +102,7 @@ func (db *DB) CreateURL(shortURL string, longURL string, userID uint) (string, e
 }
 
 // Gets the URL from the db using the short URL and returns it
-func (db *DB) GetURL(shortURL string) (URL, error) {
+func (db *DB) GetURLFromShortURL(shortURL string) (URL, error) {
 	var url URL;
 	result := db.Pool.Where("short_url = ?", shortURL).First(&url);
 
@@ -104,4 +111,34 @@ func (db *DB) GetURL(shortURL string) (URL, error) {
 	}
 
 	return url, nil
+}
+
+func (db *DB) GetURLFromLongURL(longURL string, userID uint) (URL, error) {
+	var url URL;
+	result := db.Pool.Where("long_url = ? AND user_id = ?", longURL, userID).First(&url);
+
+	if result.Error != nil {
+		return url, result.Error
+	}
+
+	return url, nil
+}
+
+func (db *DB) DeleteUrl(urlID string) error {
+	db.Pool.Where("id = ?", urlID).Delete(&URL{});
+
+	return nil
+}
+
+func (db *DB) GetUserURLs(userID uint) []URL {
+	log.Printf("User Id From Func: %d ", userID);
+	var urls []URL;
+	result := db.Pool.Find(&urls);
+
+	if result.Error != nil {
+		log.Println(result.Error);
+		return nil
+	}
+
+	return urls
 }
