@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/alperdegre/go-url-shortener/db"
@@ -30,6 +31,11 @@ type shortenUrlRequest struct {
 	Url string `json:"url" binding:"required"`
 }
 
+type CustomJWTClaims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
+
 func (r *Router) CreateShortenedUrl(ctx *gin.Context){
 	var reqJson shortenUrlRequest;
 
@@ -43,6 +49,18 @@ func (r *Router) CreateShortenedUrl(ctx *gin.Context){
 		return
 	}
 
+	existingLongUrl, err := r.Db.GetURLFromLongURL(reqJson.Url, userID);
+
+	if err == nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	if existingLongUrl.ShortURL != "" {
+		ctx.JSON(http.StatusOK, gin.H{"url": existingLongUrl.ShortURL});
+		return
+	}
+ 
 	// Create a hash from the URL
 	hashedUrl := r.createHash(reqJson.Url);
 
@@ -63,7 +81,7 @@ func (r *Router) GetShortenedUrl(ctx *gin.Context){
 	hash := ctx.Param("hash");
 
 	// Check db and get the URL struct which has the long and short URL
-	url, err := r.Db.GetURL(hash);
+	url, err := r.Db.GetURLFromShortURL(hash);
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "URL not found"})
@@ -98,7 +116,7 @@ func (r *Router) SignUp(ctx *gin.Context){
 	}
 
 	// Generates a hashed password
-	hashedBytes, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost);
+	hashedBytes, err := bcrypt.GenerateFromPassword([]byte(reqJson.Password), bcrypt.DefaultCost);
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
@@ -119,12 +137,16 @@ func (r *Router) SignUp(ctx *gin.Context){
 	jwtSecret := os.Getenv("JWT_SECRET");
 	expireToken := time.Now().Add(time.Hour * 24).Unix()
 
+	claims := &CustomJWTClaims{
+		Username: user.Email,
+		StandardClaims: jwt.StandardClaims{
+			Id:    strconv.Itoa(int(user.ID)),
+			ExpiresAt: expireToken,
+		},
+	}
+
 	// Create a token with the user id, username and a 24 hour expiration time
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id": user.ID,
-		"username": user.Email,
-		"exp": expireToken,
-	});
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims);
 
 	tokenString, err := token.SignedString([]byte(jwtSecret));
 
@@ -171,12 +193,16 @@ func (r *Router) Login(ctx *gin.Context){
 	jwtSecret := os.Getenv("JWT_SECRET");
 	expireToken := time.Now().Add(time.Hour * 24).Unix()
 
+	claims := &CustomJWTClaims{
+		Username: user.Email,
+		StandardClaims: jwt.StandardClaims{
+			Id:    strconv.Itoa(int(user.ID)),
+			ExpiresAt: expireToken,
+		},
+	}
+
 	// Create a token with the user id, username and a 24 hour expiration time
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id": user.ID,
-		"username": user.Email,
-		"exp": expireToken,
-	});
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims);
 
 	tokenString, err := token.SignedString([]byte(jwtSecret));
 
@@ -187,6 +213,32 @@ func (r *Router) Login(ctx *gin.Context){
 
 	// Return the token
 	ctx.JSON(http.StatusOK, gin.H{"token": tokenString});
+}
+
+func (r *Router) DeleteUrl(ctx *gin.Context) {
+	// Get url id from the param
+	urlID := ctx.Param("urlID");
+
+	err := r.Db.DeleteUrl(urlID);
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "URL deleted"});
+}
+
+func (r *Router) GetURLs(ctx *gin.Context) {
+	// Get the user id from the context
+	userID := ctx.MustGet(constants.USER_KEY).(uint);
+
+	log.Printf("User Id %d: ", userID);
+	// Get all the URLs of the user
+	urls := r.Db.GetUserURLs(userID);
+
+	// Return the URLs
+	ctx.JSON(http.StatusOK, gin.H{"urls": urls});
 }
 
 func (r *Router) createHash(url string) string {
