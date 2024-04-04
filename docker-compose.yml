@@ -5,8 +5,25 @@ services:
       context: ./server
       dockerfile: Dockerfile
     ports:
-      - '4000:4000'
+      - '3000:3000'
     volumes:
       - ./server:/app
     env_file:
       - ./server/.env
+    depends_on:
+      - db
+    networks:
+      - shortener-network
+  db:
+    image: postgres:12
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
+    networks:
+      - shortener-network
+networks:
+  shortener-network:
+    driver: bridge
