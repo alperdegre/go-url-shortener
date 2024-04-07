@@ -1,7 +1,11 @@
 import Container from "./container";
-import { buttonVariants } from "../ui/button";
+import { useContext } from "react";
+import { PageContext } from "../context/pageContext";
+import { PageState } from "@/lib/types";
 
 function Header() {
+  const { changePage } = useContext(PageContext);
+
   return (
     <header className="w-full py-4 mt-20">
       <Container className="flex justify-between items-center">
@@ -9,10 +13,41 @@ function Header() {
           <span className="text-[#00ADD8] pr-3">Go</span>
           <span className="font-normal">URL Shortener</span>
         </h1>
-        <div>
-          <a href="/login" className="uppercase text-xl tracking-wide font-semibold hover:underline">
+        <div className="flex items-center gap-4">
+          <button
+            key={"HOME"}
+            onClick={() => changePage(PageState.HOME)}
+            className="uppercase text-xl tracking-wide font-semibold hover:underline"
+          >
+            Home
+          </button>
+          <button
+            key={"LOGIN"}
+            onClick={() => changePage(PageState.LOGIN)}
+            className="uppercase text-xl tracking-wide font-semibold hover:underline"
+          >
             Login
-          </a>
+          </button>
+          <button
+            key={"SHORTEN"}
+            onClick={() => changePage(PageState.SHORTEN)}
+            className="uppercase text-xl tracking-wide font-semibold hover:underline"
+          >
+            Shorten
+          </button>
+          <button
+            key={"DASHBOARD"}
+            onClick={() => changePage(PageState.DASHBOARD)}
+            className="uppercase text-xl tracking-wide font-semibold hover:underline"
+          >
+            My Links
+          </button>
+          <button
+            key={"LOGOUT"}
+            className="uppercase text-xl tracking-wide font-semibold hover:underline"
+          >
+            Logout
+          </button>
         </div>
       </Container>
     </header>
