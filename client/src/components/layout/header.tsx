@@ -29,11 +29,11 @@ function Header() {
             Login
           </button>
           <button
-            key={"SHORTEN"}
-            onClick={() => changePage(PageState.SHORTEN)}
+            key={"ABOUT"}
+            onClick={() => changePage(PageState.ABOUT)}
             className="uppercase text-xl tracking-wide font-semibold hover:underline"
           >
-            Shorten
+            About
           </button>
           <button
             key={"DASHBOARD"}
