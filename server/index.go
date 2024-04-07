@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/joho/godotenv"
+	"github.com/gin-contrib/cors"
 )
 
 type App struct {
@@ -46,6 +47,14 @@ func main(){
 
 	// Router
 	router := gin.Default();
+
+	// CORS
+	config := cors.DefaultConfig();
+	config.AllowOrigins = []string{"http://localhost:4000"};
+	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
+    config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
+
+	router.Use(cors.New(config));
 
 	// Public get route thtat redirects to the original URL
 	router.GET("/:hash", app.router.GetShortenedUrl)
