@@ -155,7 +155,7 @@ func (r *Router) SignUp(ctx *gin.Context){
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"token": tokenString});
+	ctx.JSON(http.StatusOK, gin.H{"token": tokenString, "userID": user.ID, "expiry": expireToken});
 }
 
 func (r *Router) Login(ctx *gin.Context){
@@ -212,7 +212,7 @@ func (r *Router) Login(ctx *gin.Context){
 	}
 
 	// Return the token
-	ctx.JSON(http.StatusOK, gin.H{"token": tokenString});
+	ctx.JSON(http.StatusOK, gin.H{"token": tokenString, "userID": user.ID, "expiry": expireToken});
 }
 
 func (r *Router) DeleteUrl(ctx *gin.Context) {

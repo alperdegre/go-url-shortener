@@ -16,6 +16,7 @@ import { APIError, PageState, TokenResponse } from "@/lib/types";
 import { PageContext } from "../context/pageContext";
 import { BASE_URL } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { AuthContext } from "../context/authContext";
 
 const loginSchema = z.object({
   username: z
@@ -35,6 +36,7 @@ function Login() {
     },
   });
   const { changePage } = useContext(PageContext);
+  const { login } = useContext(AuthContext);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -61,7 +63,7 @@ function Login() {
     }
 
     const tokenResp:TokenResponse = await response.json();
-
+    login(tokenResp.token, tokenResp.userID, tokenResp.expiry);
     changePage(PageState.DASHBOARD);
   }
 

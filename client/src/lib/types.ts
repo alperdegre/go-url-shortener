@@ -12,4 +12,10 @@ export type APIError = {
 
 export type TokenResponse = {
     token: string;
+    userID: string;
+    expiry: number;
 }
+
+export type JWTToken = string | null;
+export type UserID = string | null;
+export type JWTExpiry = number | null;
