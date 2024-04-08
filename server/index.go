@@ -50,9 +50,10 @@ func main(){
 
 	// CORS
 	config := cors.DefaultConfig();
+	config.AllowCredentials = true;
 	config.AllowOrigins = []string{"http://localhost:4000", "https://localhost:4000"};
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
-    config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
+    config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
 
 	router.Use(cors.New(config));
 
