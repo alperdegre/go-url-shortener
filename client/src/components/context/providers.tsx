@@ -1,11 +1,11 @@
 import React from "react";
-import { PageProvider } from "./pageContext";
+import { AuthProvider } from "./authContext";
 
 interface Props {
   children: React.ReactNode;
 }
 function Providers({ children }: Props) {
-  return <PageProvider>{children}</PageProvider>;
+  return <AuthProvider>{children}</AuthProvider>;
 }
 
 export default Providers;

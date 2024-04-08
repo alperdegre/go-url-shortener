@@ -1,10 +1,9 @@
 import Container from "./container";
 import { useContext } from "react";
-import { PageContext } from "../context/pageContext";
 import { PageState } from "@/lib/types";
+import { Link, useNavigate } from "react-router-dom";
 
 function Header() {
-  const { changePage } = useContext(PageContext);
 
   return (
     <header className="w-full py-4 mt-20">
@@ -14,34 +13,34 @@ function Header() {
           <span className="font-normal">URL Shortener</span>
         </h1>
         <div className="flex items-center gap-4">
-          <button
+          <Link
             key={"HOME"}
-            onClick={() => changePage(PageState.HOME)}
+            to={"/"}
             className="uppercase text-xl tracking-wide font-semibold hover:underline"
           >
             Home
-          </button>
-          <button
+          </Link>
+          <Link
             key={"LOGIN"}
-            onClick={() => changePage(PageState.LOGIN)}
+            to={"/login"}
             className="uppercase text-xl tracking-wide font-semibold hover:underline"
           >
             Login
-          </button>
-          <button
+          </Link>
+          <Link
             key={"ABOUT"}
-            onClick={() => changePage(PageState.ABOUT)}
+            to={"/about"}
             className="uppercase text-xl tracking-wide font-semibold hover:underline"
           >
             About
-          </button>
-          <button
+          </Link>
+          <Link
             key={"DASHBOARD"}
-            onClick={() => changePage(PageState.DASHBOARD)}
+            to={"/dashboard"}    
             className="uppercase text-xl tracking-wide font-semibold hover:underline"
           >
             My Links
-          </button>
+          </Link>
           <button
             key={"LOGOUT"}
             className="uppercase text-xl tracking-wide font-semibold hover:underline"

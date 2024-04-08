@@ -1,7 +1,7 @@
 import { JWTExpiry, JWTToken, PageState, UserID } from "@/lib/types";
 import { createContext, useContext, useEffect, useState } from "react";
-import { PageContext } from "./pageContext";
 import { PROTECTED_ROUTES } from "@/lib/utils";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   token: JWTToken;
@@ -25,7 +25,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<JWTToken>(null);
   const [userID, setUserID] = useState<UserID>(null);
   const [expiry, setExpiry] = useState<JWTExpiry>(null);
-  const { page, changePage } = useContext(PageContext);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const userData = localStorage.getItem("userData");
@@ -34,19 +35,30 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       const remainingTime = parsedData.expiry - Date.now();
       if (remainingTime < 0) {
         logout();
-        changePage(PageState.LOGIN);
+        navigate("/login");
       } else {
         setToken(parsedData.token);
         setUserID(parsedData.userID);
         setExpiry(parsedData.expiry);
-        changePage(PageState.DASHBOARD);
+        navigate("/dashboard");
       }
     }
   }, []);
 
   useEffect(() => {
+    if (PROTECTED_ROUTES.includes(location.pathname) && !token) {
+      navigate("/login");
+    }
+
+    if (
+      (location.pathname === "/login" || location.pathname === "/signup") &&
+      token
+    ) {
+      navigate("/dashboard");
+    }
+
     if (expiry) {
-      const remainingTime = expiry - Date.now();
+      const remainingTime = expiry - Math.floor(Date.now() / 1000);
       if (remainingTime < 0) {
         logout();
       } else {
@@ -54,15 +66,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         return () => clearTimeout(timer);
       }
     }
-
-    if (PROTECTED_ROUTES.includes(page) && !token) {
-      changePage(PageState.LOGIN);
-    }
-
-    if ((page === PageState.LOGIN || page === PageState.SIGNUP) && token) {
-      changePage(PageState.DASHBOARD);
-    }
-  }, [page]);
+  }, [location.pathname]);
 
   const login = (token: JWTToken, userID: UserID, expiry: JWTExpiry) => {
     setToken(token);

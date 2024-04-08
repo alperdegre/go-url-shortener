@@ -12,11 +12,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { APIError, PageState, TokenResponse } from "@/lib/types";
-import { PageContext } from "../context/pageContext";
+import { APIError, TokenResponse } from "@/lib/types";
 import { BASE_URL } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { AuthContext } from "../context/authContext";
+import { Link, useNavigate } from "react-router-dom";
 
 const signUpSchema = z.object({
   username: z
@@ -35,7 +35,7 @@ function SignUp() {
       password: "",
     },
   });
-  const { changePage } = useContext(PageContext);
+  const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [error, setError] = useState("");
 
@@ -48,7 +48,6 @@ function SignUp() {
   }, [error]);
 
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
-    console.log(values);
     const response = await fetch(`${BASE_URL}/auth/signup`, {
       method: "POST",
       headers: {
@@ -58,14 +57,13 @@ function SignUp() {
     });
 
     if (!response.ok) {
-      const errResponse: APIError = await response.json()
+      const errResponse: APIError = await response.json();
       setError(errResponse.error);
+    } else {
+      const tokenResp: TokenResponse = await response.json();
+      login(tokenResp.token, tokenResp.userID, tokenResp.expiry);
+      navigate("/dashboard");
     }
-
-    const tokenResp:TokenResponse = await response.json();
-
-    login(tokenResp.token, tokenResp.userID, tokenResp.expiry);
-    changePage(PageState.DASHBOARD);
   }
 
   return (
@@ -79,9 +77,7 @@ function SignUp() {
         transition={{ duration: 0.2 }}
       >
         {error ? (
-          <p className="text-sm tracking-wider text-destructive">
-            {error}
-          </p>
+          <p className="text-sm tracking-wider text-destructive">{error}</p>
         ) : (
           <p className="text-sm tracking-wider">
             Create a new account to start shortening your URLs
@@ -127,13 +123,12 @@ function SignUp() {
                 </Button>
                 <p className="text-xs text-center">
                   Already have an account?{" "}
-                  <button
+                  <Link
                     className="text-[#00ADD8] hover:underline"
-                    onClick={() => changePage(PageState.LOGIN)}
-                    type="button"
+                    to="/login"
                   >
                     Login
-                  </button>
+                  </Link>
                 </p>
               </div>
             </div>
