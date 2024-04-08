@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 interface AuthContextType {
   token: JWTToken;
   userID: UserID;
+  loggingOut: boolean;
   login: (token: JWTToken, userID: UserID, expiry: JWTExpiry) => void;
   logout: () => void;
 }
@@ -13,6 +14,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   token: null,
   userID: null,
+  loggingOut: false,
   login: () => {},
   logout: () => {},
 });
@@ -25,6 +27,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<JWTToken>(null);
   const [userID, setUserID] = useState<UserID>(null);
   const [expiry, setExpiry] = useState<JWTExpiry>(null);
+  const [loggingOut, setLoggingOut] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -76,14 +79,19 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const logout = () => {
+    setLoggingOut(true);
     setToken(null);
-    setUserID(null);
     setExpiry(null);
     localStorage.removeItem("userData");
+    setTimeout(() => {
+      setLoggingOut(false);
+      navigate("/");
+      setUserID(null);
+    }, 1000);
   };
 
   return (
-    <AuthContext.Provider value={{ token, userID, login, logout }}>
+    <AuthContext.Provider value={{ token, userID, login, logout, loggingOut }}>
       {children}
     </AuthContext.Provider>
   );
