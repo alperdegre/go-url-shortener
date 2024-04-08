@@ -10,6 +10,10 @@ export type APIError = {
     error: string;
 }
 
+export type UrlResponse = {
+    url: string;
+}
+
 export type TokenResponse = {
     token: string;
     userID: string;
