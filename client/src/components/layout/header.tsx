@@ -3,6 +3,7 @@ import NavButton from "../ui/navButton";
 import { motion } from "framer-motion";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
+import { Link } from "react-router-dom";
 
 function Header() {
   const { loggingOut, logout, userID } = useContext(AuthContext);
@@ -10,10 +11,10 @@ function Header() {
   return (
     <header className="w-full py-4 mt-20">
       <Container className="flex justify-between items-center">
-        <h1 className="text-4xl uppercase font-bold tracking-wider">
+        <Link to="/" className="text-4xl uppercase font-bold tracking-wider">
           <span className="text-golang pr-3">Go</span>
           <span className="font-normal">URL Shortener</span>
-        </h1>
+        </Link>
         <div className="flex items-center gap-4">
           <NavButton key={"HOME"} to={"/"} text={"Home"} />
           {!userID && <NavButton key={"LOGIN"} to={"/login"} text={"Login"} />}

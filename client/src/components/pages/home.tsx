@@ -16,7 +16,7 @@ function Home() {
         ?
       </h1>
       <p className="tracking-wide pb-2">
-        <span className="text-golang">GO</span> Url Shortener is a{" "}
+        <span className="text-golang">GO</span> Url Shortener is{" "}
         <i className="text-sm font-bold">- you guessed it -</i> a URL shortener
         made with <span className="text-golang">Go</span>.
       </p>
