@@ -7,9 +7,9 @@ function Footer() {
       <Container>
         <div className="flex justify-between py-4">
           <div className="flex items-center font-light gap-2">
-            <p>Golang Url Shortener</p>
+            <p><span className="text-golang">Go</span> Url Shortener</p>
             <span>{`\u2014`}</span>
-            <p>Demo project made by <a href="https://github.com/alperdegre" className="font-bold">alperdegre</a> to learn Golang</p>
+            <p>Demo project made by <a href="https://github.com/alperdegre" className="font-bold text-golang">alperdegre</a> to learn <span className="text-golang">Go</span></p>
           </div>
           <div>
           </div>

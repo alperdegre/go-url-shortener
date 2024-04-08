@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { APIError, TokenResponse } from "@/lib/types";
 import { BASE_URL } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { AuthContext } from "../context/authContext";
+import { AuthContext } from "../../context/authContext";
 import { Link, useNavigate } from "react-router-dom";
 
 const signUpSchema = z.object({
@@ -24,7 +24,7 @@ const signUpSchema = z.object({
     .min(5, { message: "Username must be at least 5 characters long" }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters long" }),
+    .min(5, { message: "Password must be at least 5 characters long" }),
 });
 
 function SignUp() {
@@ -38,6 +38,7 @@ function SignUp() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -48,6 +49,7 @@ function SignUp() {
   }, [error]);
 
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
+    setSubmitting(true);
     const response = await fetch(`${BASE_URL}/auth/signup`, {
       method: "POST",
       headers: {
@@ -64,6 +66,7 @@ function SignUp() {
       login(tokenResp.token, tokenResp.userID, tokenResp.expiry);
       navigate("/dashboard");
     }
+    setSubmitting(false);
   }
 
   return (
@@ -118,15 +121,12 @@ function SignUp() {
             />
             <div className="pt-2 flex items-center justify-between">
               <div className="flex items-center gap-6">
-                <Button type="submit" variant={"default"}>
+                <Button type="submit" variant={"golang"} disabled={submitting}>
                   SIGN UP
                 </Button>
                 <p className="text-xs text-center">
                   Already have an account?{" "}
-                  <Link
-                    className="text-[#00ADD8] hover:underline"
-                    to="/login"
-                  >
+                  <Link className="text-golang hover:underline" to="/login">
                     Login
                   </Link>
                 </p>
