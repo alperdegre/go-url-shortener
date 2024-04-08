@@ -40,10 +40,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         logout();
         navigate("/login");
       } else {
+        const timer = setTimeout(logout, remainingTime);
         setToken(parsedData.token);
         setUserID(parsedData.userID);
         setExpiry(parsedData.expiry);
         navigate("/dashboard");
+
+        return () => clearTimeout(timer);
       }
     }
   }, []);
@@ -58,16 +61,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       token
     ) {
       navigate("/dashboard");
-    }
-
-    if (expiry) {
-      const remainingTime = expiry - Math.floor(Date.now() / 1000);
-      if (remainingTime < 0) {
-        logout();
-      } else {
-        const timer = setTimeout(logout, remainingTime);
-        return () => clearTimeout(timer);
-      }
     }
   }, [location.pathname]);
 

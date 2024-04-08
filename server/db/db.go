@@ -18,7 +18,8 @@ type User struct {
 }
 
 type URL struct {
-	gorm.Model
+	ID        uint `gorm:"primarykey"`
+    CreatedAt time.Time
 	ShortURL string
 	LongURL  string
 	UserID   uint
@@ -113,15 +114,15 @@ func (db *DB) GetURLFromShortURL(shortURL string) (URL, error) {
 	return url, nil
 }
 
-func (db *DB) GetURLFromLongURL(longURL string, userID uint) (URL, error) {
+func (db *DB) GetURLFromLongURL(longURL string, userID uint) URL {
 	var url URL;
 	result := db.Pool.Where("long_url = ? AND user_id = ?", longURL, userID).First(&url);
 
 	if result.Error != nil {
-		return url, result.Error
+		return url
 	}
 
-	return url, nil
+	return url
 }
 
 func (db *DB) DeleteUrl(urlID string) error {
@@ -130,15 +131,15 @@ func (db *DB) DeleteUrl(urlID string) error {
 	return nil
 }
 
-func (db *DB) GetUserURLs(userID uint) []URL {
+func (db *DB) GetUserURLs(userID uint) ([]URL, error) {
 	log.Printf("User Id From Func: %d ", userID);
 	var urls []URL;
 	result := db.Pool.Find(&urls);
 
 	if result.Error != nil {
 		log.Println(result.Error);
-		return nil
+		return nil, result.Error
 	}
 
-	return urls
+	return urls, nil
 }

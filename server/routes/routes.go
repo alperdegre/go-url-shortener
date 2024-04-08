@@ -49,12 +49,7 @@ func (r *Router) CreateShortenedUrl(ctx *gin.Context){
 		return
 	}
 
-	existingLongUrl, err := r.Db.GetURLFromLongURL(reqJson.Url, userID);
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-		return
-	}
+	existingLongUrl := r.Db.GetURLFromLongURL(reqJson.Url, userID);
 
 	if existingLongUrl.ShortURL != "" {
 		ctx.JSON(http.StatusOK, gin.H{"url": existingLongUrl.ShortURL});
@@ -233,9 +228,13 @@ func (r *Router) GetURLs(ctx *gin.Context) {
 	// Get the user id from the context
 	userID := ctx.MustGet(constants.USER_KEY).(uint);
 
-	log.Printf("User Id %d: ", userID);
 	// Get all the URLs of the user
-	urls := r.Db.GetUserURLs(userID);
+	urls, err := r.Db.GetUserURLs(userID);
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+		return
+	}
 
 	// Return the URLs
 	ctx.JSON(http.StatusOK, gin.H{"urls": urls});
