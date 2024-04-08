@@ -51,7 +51,7 @@ func (r *Router) CreateShortenedUrl(ctx *gin.Context){
 
 	existingLongUrl, err := r.Db.GetURLFromLongURL(reqJson.Url, userID);
 
-	if err == nil {
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
 		return
 	}
