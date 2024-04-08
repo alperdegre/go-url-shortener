@@ -35,7 +35,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     const userData = localStorage.getItem("userData");
     if (userData) {
       const parsedData = JSON.parse(userData);
-      const remainingTime = parsedData.expiry - Date.now();
+      const remainingTime = parsedData.expiry - Math.floor(Date.now() / 1000);
       if (remainingTime < 0) {
         logout();
         navigate("/login");
