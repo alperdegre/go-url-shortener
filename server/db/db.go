@@ -13,7 +13,7 @@ import (
 
 type User struct {
 	gorm.Model
-	Email        string
+	Username     string
 	Password     string  
 }
 
@@ -69,10 +69,10 @@ func (db *DB) TryMigrations() {
 	}
 }
 
-// Gets the user from db using the email and returns it
-func (db *DB) GetUser(email string) (User, error) {
+// Gets the user from db using the username and returns it
+func (db *DB) GetUser(username string) (User, error) {
 	var user User;
-	result := db.Pool.Where("email = ?", email).First(&user);
+	result := db.Pool.Where("username = ?", username).First(&user);
 
 	if result.Error != nil {
 		return user, result.Error
@@ -81,11 +81,11 @@ func (db *DB) GetUser(email string) (User, error) {
 	return user, nil
 }
 
-// Creates a new user with the provided email and hashed password
-func (db *DB) CreateUser(email string, password string) (User, error){
-	db.Pool.Create(&User{Email: email, Password: password});
+// Creates a new user with the provided username and hashed password
+func (db *DB) CreateUser(username string, password string) (User, error){
+	db.Pool.Create(&User{Username: username, Password: password});
 
-	user, err := db.GetUser(email);
+	user, err := db.GetUser(username);
 
 	if err != nil {
 		return user, err

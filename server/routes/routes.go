@@ -138,7 +138,7 @@ func (r *Router) SignUp(ctx *gin.Context){
 	expireToken := time.Now().Add(time.Hour * 24).Unix()
 
 	claims := &CustomJWTClaims{
-		Username: user.Email,
+		Username: user.Username,
 		StandardClaims: jwt.StandardClaims{
 			Id:    strconv.Itoa(int(user.ID)),
 			ExpiresAt: expireToken,
@@ -194,7 +194,7 @@ func (r *Router) Login(ctx *gin.Context){
 	expireToken := time.Now().Add(time.Hour * 24).Unix()
 
 	claims := &CustomJWTClaims{
-		Username: user.Email,
+		Username: user.Username,
 		StandardClaims: jwt.StandardClaims{
 			Id:    strconv.Itoa(int(user.ID)),
 			ExpiresAt: expireToken,

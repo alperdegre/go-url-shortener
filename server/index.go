@@ -50,7 +50,7 @@ func main(){
 
 	// CORS
 	config := cors.DefaultConfig();
-	config.AllowOrigins = []string{"http://localhost:4000"};
+	config.AllowOrigins = []string{"http://localhost:4000", "https://localhost:4000"};
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
     config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
 
