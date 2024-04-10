@@ -2,12 +2,10 @@ import { AuthContext } from "@/context/authContext";
 import { URL } from "@/lib/types";
 import { BASE_URL } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { CopyIcon, DeleteIcon, Trash } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import LinkRow from "../ui/linkRow";
 
 function Dashboard() {
-  const [submitting, setSubmitting] = useState(false);
   const [urls, setURLs] = useState<URL[]>([]);
   const [error, setError] = useState("");
   const { token } = useContext(AuthContext);
@@ -40,24 +38,6 @@ function Dashboard() {
       }, 5000);
     }
   }, [error]);
-
-  const handleRefetch = async () => {
-    if (!token) return;
-    const response = await fetch(`${BASE_URL}/api/get`, {
-      method: "GET",
-      headers: {
-        Authorization: token,
-      },
-    });
-
-    if (!response.ok) {
-      const errResponse = await response.json();
-      setError(errResponse.error);
-    } else {
-      const urlsResponse = await response.json();
-      setURLs(urlsResponse.urls);
-    }
-  };
 
   return (
     <div className="flex flex-col gap-2">

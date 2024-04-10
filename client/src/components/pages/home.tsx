@@ -1,6 +1,5 @@
 import {
   GithubIcon,
-  InstagramIcon,
   LinkedinIcon,
   TwitterIcon,
 } from "@/lib/icons";
@@ -11,7 +10,7 @@ function Home() {
       <h1 className="text-2xl font-normal pb-2">
         What is{" "}
         <span className="font-semibold">
-          <span className="text-golang">GO</span> Url Shortener
+          <span className="text-golang">GO</span> URL SHORTENER
         </span>{" "}
         ?
       </h1>

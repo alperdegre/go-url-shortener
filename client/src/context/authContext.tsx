@@ -1,5 +1,5 @@
-import { JWTExpiry, JWTToken, PageState, UserID } from "@/lib/types";
-import { createContext, useContext, useEffect, useState } from "react";
+import { JWTExpiry, JWTToken, UserID } from "@/lib/types";
+import { createContext, useCallback, useEffect, useState } from "react";
 import { PROTECTED_ROUTES } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -26,7 +26,6 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<JWTToken>(null);
   const [userID, setUserID] = useState<UserID>(null);
-  const [expiry, setExpiry] = useState<JWTExpiry>(null);
   const [loggingOut, setLoggingOut] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,7 +42,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         const timer = setTimeout(logout, remainingTime);
         setToken(parsedData.token);
         setUserID(parsedData.userID);
-        setExpiry(parsedData.expiry);
         navigate("/dashboard");
 
         return () => clearTimeout(timer);
@@ -53,7 +51,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     if (PROTECTED_ROUTES.includes(location.pathname) && !token) {
-      navigate("/login");
+      navigate("/");
     }
 
     if (
@@ -62,26 +60,24 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     ) {
       navigate("/dashboard");
     }
-  }, [location.pathname]);
+  }, [location.pathname, navigate, token]);
 
   const login = (token: JWTToken, userID: UserID, expiry: JWTExpiry) => {
     setToken(token);
     setUserID(userID);
-    setExpiry(expiry);
     localStorage.setItem("userData", JSON.stringify({ token, userID, expiry }));
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setLoggingOut(true);
     setToken(null);
-    setExpiry(null);
     localStorage.removeItem("userData");
     setTimeout(() => {
       setLoggingOut(false);
       navigate("/");
       setUserID(null);
     }, 1000);
-  };
+  }, [navigate]);
 
   return (
     <AuthContext.Provider value={{ token, userID, login, logout, loggingOut }}>

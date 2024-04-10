@@ -42,11 +42,11 @@ function Shorten() {
     }
   }, [error]);
 
+  const url = urlForm.getValues("url");
+
   useEffect(() => {
-    if (shortenedURL) {
-      setShortenedURL("");
-    }
-  }, [urlForm.getValues("url")]);
+    setShortenedURL("");
+  }, [url]);
 
   async function onSubmit(values: z.infer<typeof urlSchema>) {
     if (!token) return;
@@ -137,7 +137,11 @@ function Shorten() {
                             setTimeout(() => setCopying(false), 1000);
                           }}
                         >{`Click to Copy \u2014`}</p>
-                        <a href={shortenedURL} target="_blank" className="tracking-wider text-golang">
+                        <a
+                          href={shortenedURL}
+                          target="_blank"
+                          className="tracking-wider text-golang"
+                        >
                           {shortenedURL}
                         </a>
                       </>
