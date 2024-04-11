@@ -4,12 +4,12 @@ import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
 
 interface Props {
-  key: string;
   to: string;
   text: string;
+  key?: string;
 }
 
-function NavButton({ key, to, text }: Props) {
+function NavButton({ to, text, key }: Props) {
   const location = useLocation();
   const { loggingOut } = useContext(AuthContext);
 

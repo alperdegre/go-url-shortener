@@ -16,17 +16,16 @@ function Header() {
           <span className="font-normal">URL Shortener</span>
         </Link>
         <div className="flex items-center gap-4">
-          <NavButton key={"HOME"} to={"/"} text={"Home"} />
-          {!userID && <NavButton key={"LOGIN"} to={"/login"} text={"Login"} />}
+          <NavButton to={"/"} text={"Home"} />
+          {!userID && <NavButton to={"/login"} text={"Login"} />}
           {userID && (
-            <NavButton key={"SHORTEN"} to={"/shorten"} text={"Shorten"} />
+            <NavButton to={"/shorten"} text={"Shorten"} />
           )}
           {userID && (
-            <NavButton key={"DASHBOARD"} to={"/dashboard"} text={"My Links"} />
+            <NavButton to={"/dashboard"} text={"My Links"} />
           )}
           {userID && (
             <button
-              key={"LOGOUT"}
               className="uppercase text-xl tracking-wide relative"
               onClick={logout}
             >
