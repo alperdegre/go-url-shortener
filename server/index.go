@@ -2,35 +2,28 @@ package main
 
 import (
 	"fmt"
+	"github.com/alperdegre/go-url-shortener/db"
+	"github.com/alperdegre/go-url-shortener/routes"
+	constants "github.com/alperdegre/go-url-shortener/util"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
-	"github.com/alperdegre/go-url-shortener/db"
-	"github.com/alperdegre/go-url-shortener/routes"
-	constants "github.com/alperdegre/go-url-shortener/util"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
-	"github.com/joho/godotenv"
-	"github.com/gin-contrib/cors"
 )
 
 type App struct {
 	router routes.Router
 }
 
-func main(){
-	envErr := godotenv.Load()
-
-	if envErr != nil {
-		log.Fatal();
-	}
-
+func main() {
 	// Initializes db and gets the pointer to the gorm.DB instance
-	gormDb, err := db.InitDB();
+	gormDb, err := db.InitDB()
 
 	if err != nil {
-		log.Fatal(err);
+		log.Fatal(err)
 	}
 
 	// Initializes the App struct with the router
@@ -43,19 +36,19 @@ func main(){
 	}
 
 	// Tries to run the migrations
-	app.router.Db.TryMigrations();
+	app.router.Db.TryMigrations()
 
 	// Router
-	router := gin.Default();
+	router := gin.Default()
 
 	// CORS
-	config := cors.DefaultConfig();
-	config.AllowCredentials = true;
-	config.AllowOrigins = []string{"http://localhost:4000", "https://localhost:4000"};
+	config := cors.DefaultConfig()
+	config.AllowCredentials = true
+	config.AllowOrigins = []string{"http://localhost:4000", "https://localhost:4000"}
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
-    config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
+	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
 
-	router.Use(cors.New(config));
+	router.Use(cors.New(config))
 
 	// Public get route thtat redirects to the original URL
 	router.GET("/:hash", app.router.GetShortenedUrl)
@@ -78,23 +71,17 @@ func main(){
 		}
 	}
 
-	router.Run(":3000");
+	router.Run(":3000")
 }
 
 // AuthMiddleware checks the Authorization header and validates the JWT token
-func AuthMiddleware(ctx *gin.Context){
-	envErr := godotenv.Load()
-	if envErr != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
-		return
-	}
-
-	jwtSecret := os.Getenv("JWT_SECRET");
-	token := ctx.GetHeader("Authorization");
+func AuthMiddleware(ctx *gin.Context) {
+	jwtSecret := os.Getenv("JWT_SECRET")
+	token := ctx.GetHeader("Authorization")
 
 	if token == "" {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		ctx.Abort();
+		ctx.Abort()
 		return
 	}
 
@@ -103,19 +90,19 @@ func AuthMiddleware(ctx *gin.Context){
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("there was an error while parsing the token")
 		}
-	
+
 		return []byte(jwtSecret), nil
 	})
 
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		ctx.Abort();
+		ctx.Abort()
 		return
 	}
 
 	if !parsed.Valid {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		ctx.Abort();
+		ctx.Abort()
 		return
 	}
 
@@ -134,7 +121,8 @@ func AuthMiddleware(ctx *gin.Context){
 		ctx.Abort()
 		return
 	}
-	
+
 	ctx.Set(constants.USER_KEY, uint(userId))
 	ctx.Next()
 }
+

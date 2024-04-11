@@ -2,45 +2,38 @@ package db
 
 import (
 	"fmt"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"log"
 	"os"
 	"time"
-
-	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 type User struct {
 	gorm.Model
-	Username     string
-	Password     string  
+	Username string
+	Password string
 }
 
 type URL struct {
 	ID        uint `gorm:"primarykey"`
-    CreatedAt time.Time
-	ShortURL string
-	LongURL  string
-	UserID   uint
-	User     User
+	CreatedAt time.Time
+	ShortURL  string
+	LongURL   string
+	UserID    uint
+	User      User
 }
 
 type DB struct {
- 	Pool *gorm.DB
+	Pool *gorm.DB
 }
 
 func InitDB() (*gorm.DB, error) {
-	envErr := godotenv.Load()
-	if envErr != nil {
-		log.Fatal();
-	}
-
 	// Get DB connection string from .env
-	dbConnectionString := os.Getenv("DATABASE_URL");
-
+	dbConnectionString := os.Getenv("DATABASE_URL")
+	fmt.Println(dbConnectionString)
 	if dbConnectionString == "" {
-		log.Fatal("DATABASE_URL env variable is not set");
+		log.Fatal("DATABASE_URL env variable is not set")
 	}
 
 	// Connect to the postgres DB using GORM
@@ -51,11 +44,11 @@ func InitDB() (*gorm.DB, error) {
 		if err == nil {
 			return gormDb, nil
 		}
-		fmt.Printf("[%d/3] - Error connecting to DB, retrying in 5 seconds...\n", i + 1);
+		fmt.Printf("[%d/3] - Error connecting to DB, retrying in 5 seconds...\n", i+1)
 		time.Sleep(5 * time.Second)
 	}
 
-	log.Fatal("Error connecting to DB");
+	log.Fatal("Error connecting to DB")
 	return nil, nil
 }
 
@@ -65,15 +58,15 @@ func (db *DB) TryMigrations() {
 
 	// If there is an error, log it and exit
 	if err != nil {
-		log.Printf("There was an error while migrating");
+		log.Printf("There was an error while migrating")
 		log.Fatal(err)
 	}
 }
 
 // Gets the user from db using the username and returns it
 func (db *DB) GetUser(username string) (User, error) {
-	var user User;
-	result := db.Pool.Where("username = ?", username).First(&user);
+	var user User
+	result := db.Pool.Where("username = ?", username).First(&user)
 
 	if result.Error != nil {
 		return user, result.Error
@@ -83,10 +76,10 @@ func (db *DB) GetUser(username string) (User, error) {
 }
 
 // Creates a new user with the provided username and hashed password
-func (db *DB) CreateUser(username string, password string) (User, error){
-	db.Pool.Create(&User{Username: username, Password: password});
+func (db *DB) CreateUser(username string, password string) (User, error) {
+	db.Pool.Create(&User{Username: username, Password: password})
 
-	user, err := db.GetUser(username);
+	user, err := db.GetUser(username)
 
 	if err != nil {
 		return user, err
@@ -97,15 +90,15 @@ func (db *DB) CreateUser(username string, password string) (User, error){
 
 // Creates a new URL with the provided short URL, long URL and user ID
 func (db *DB) CreateURL(shortURL string, longURL string, userID uint) (string, error) {
-	db.Pool.Create(&URL{ShortURL: shortURL, LongURL: longURL, UserID: userID});
+	db.Pool.Create(&URL{ShortURL: shortURL, LongURL: longURL, UserID: userID})
 
 	return shortURL, nil
 }
 
 // Gets the URL from the db using the short URL and returns it
 func (db *DB) GetURLFromShortURL(shortURL string) (URL, error) {
-	var url URL;
-	result := db.Pool.Where("short_url = ?", shortURL).First(&url);
+	var url URL
+	result := db.Pool.Where("short_url = ?", shortURL).First(&url)
 
 	if result.Error != nil {
 		return url, result.Error
@@ -115,8 +108,8 @@ func (db *DB) GetURLFromShortURL(shortURL string) (URL, error) {
 }
 
 func (db *DB) GetURLFromLongURL(longURL string, userID uint) URL {
-	var url URL;
-	result := db.Pool.Where("long_url = ? AND user_id = ?", longURL, userID).First(&url);
+	var url URL
+	result := db.Pool.Where("long_url = ? AND user_id = ?", longURL, userID).First(&url)
 
 	if result.Error != nil {
 		return url
@@ -126,20 +119,21 @@ func (db *DB) GetURLFromLongURL(longURL string, userID uint) URL {
 }
 
 func (db *DB) DeleteUrl(urlID string) error {
-	db.Pool.Where("id = ?", urlID).Delete(&URL{});
+	db.Pool.Where("id = ?", urlID).Delete(&URL{})
 
 	return nil
 }
 
 func (db *DB) GetUserURLs(userID uint) ([]URL, error) {
-	log.Printf("User Id From Func: %d ", userID);
-	var urls []URL;
-	result := db.Pool.Find(&urls);
+	log.Printf("User Id From Func: %d ", userID)
+	var urls []URL
+	result := db.Pool.Find(&urls)
 
 	if result.Error != nil {
-		log.Println(result.Error);
+		log.Println(result.Error)
 		return nil, result.Error
 	}
 
 	return urls, nil
 }
+
