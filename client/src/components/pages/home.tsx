@@ -7,7 +7,7 @@ import {
 function Home() {
   return (
     <div className="space-y-1">
-      <h1 className="text-2xl font-normal pb-2">
+      <h1 className="text-lg md:text-2xl font-normal pb-2">
         What is{" "}
         <span className="font-semibold">
           <span className="text-golang">GO</span> URL SHORTENER

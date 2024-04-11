@@ -47,49 +47,53 @@ function LinkRow({ url, ix, onError }: Props) {
       >
         {deleting ? null : (
           <div
-            className={`flex w-full items-center py-1 rounded-md ${
-              ix % 2 === 0 && "bg-golang/10"
-            }`}
+            className={`flex w-full items-center justify-between py-1 rounded-md ${ix % 2 === 0 && "bg-golang/10"
+              }`}
           >
-            <p className="w-[45%] text-xs pl-2">{url.LongURL}</p>
-            <a
-              href={`${BASE_URL}/${url.ShortURL}`}
-              target="_blank"
-              className="w-[40%] text-xs text-golang font-semibold"
-            >
-              {BASE_URL}/{url.ShortURL}
-            </a>
-            <motion.div
-              key={url.ShortURL + copying}
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 10, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="w-[8%] text-center flex items-center justify-center cursor-pointer"
-            >
-              {copying ? (
-                <p className="text-xs w-max text-center">Copied</p>
-              ) : (
-                <p
-                  className="w-full flex items-center justify-center group"
-                  onClick={() => {
-                    setCopying(true);
-                    navigator.clipboard.writeText(
-                      `${BASE_URL}/${url.ShortURL}`
-                    );
-                    setTimeout(() => setCopying(false), 1000);
-                  }}
-                >
-                  <CopyIcon className="w-4 h-4 group-hover:text-golang transition duration-300" />
-                </p>
-              )}
-            </motion.div>
-            <p
-              className="w-[7%] text-center flex items-center justify-center group cursor-pointer"
-              onClick={() => handleDelete()}
-            >
-              <Trash className="w-4 h-4 group-hover:text-golang transition duration-300" />
-            </p>
+            <div className="w-[65%] md:w-[75%] flex items-center flex-col-reverse md:flex-row">
+
+              <p className="w-full md:w-[50%] text-xs pl-2">{url.LongURL}</p>
+              <a
+                href={`${BASE_URL}/${url.ShortURL}`}
+                target="_blank"
+                className="w-full md:w-[50%] pl-2 md:pl-0 text-xs text-golang font-semibold"
+              >
+                {BASE_URL}/{url.ShortURL}
+              </a>
+            </div>
+            <div className="w-[35%] md:w-[25%] flex items-center">
+              <motion.div
+                key={url.ShortURL + copying}
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 10, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="w-full text-center flex items-center justify-center cursor-pointer"
+              >
+                {copying ? (
+                  <p className="text-xs w-max text-center">Copied</p>
+                ) : (
+                  <p
+                    className="w-full flex items-center justify-center group"
+                    onClick={() => {
+                      setCopying(true);
+                      navigator.clipboard.writeText(
+                        `${BASE_URL}/${url.ShortURL}`
+                      );
+                      setTimeout(() => setCopying(false), 1000);
+                    }}
+                  >
+                    <CopyIcon className="w-4 h-4 group-hover:text-golang transition duration-300" />
+                  </p>
+                )}
+              </motion.div>
+              <p
+                className="w-full text-center flex items-center justify-center group cursor-pointer"
+                onClick={() => handleDelete()}
+              >
+                <Trash className="w-4 h-4 group-hover:text-golang transition duration-300" />
+              </p>
+            </div>
           </div>
         )}
       </motion.div>

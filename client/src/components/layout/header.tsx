@@ -9,10 +9,10 @@ function Header() {
   const { loggingOut, logout, userID } = useContext(AuthContext);
 
   return (
-    <header className="w-full py-4 mt-20">
-      <Container className="flex justify-between items-center">
+    <header className="w-full py-4 mt-10 md:mt-20">
+      <Container className="flex justify-between items-center flex-col lg:flex-row gap-4 lg:gap-0">
         <Link to="/" className="text-4xl uppercase font-bold tracking-wider">
-          <span className="text-golang pr-3">Go</span>
+          <span className="text-golang pr-2">Go</span>
           <span className="font-normal">URL Shortener</span>
         </Link>
         <div className="flex items-center gap-4">

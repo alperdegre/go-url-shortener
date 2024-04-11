@@ -60,11 +60,13 @@ function Dashboard() {
         )}
       </motion.div>
       <div className="p-4 h-[300px] overflow-y-scroll">
-        <div className="flex w-full items-center pb-2">
-          <p className="w-[45%] font-semibold">Long URL</p>
-          <p className="w-[40%] font-semibold">Short URL</p>
-          <p className="w-[8%] text-center font-semibold ">Copy</p>
-          <p className="w-[7%] text-center font-semibold">Delete</p>
+        <div className="flex w-full justify-between items-center pb-2">
+          <div className="flex items-center w-[65%] md:w-[75%]"><p className="w-[50%] font-semibold pl-2 hidden md:inline-block">Long URL</p>
+            <p className="w-[50%] font-semibold pl-2">Short URL</p></div>
+          <div className="w-[35%] md:w-[25%] flex items-center">
+            <p className="w-full text-center text-xs md:text-base font-semibold ">Copy</p>
+            <p className="w-full text-center text-xs md:text-base font-semibold">Delete</p>
+          </div>
         </div>
         <div className="flex flex-col gap-1">
           {urls.map((url, ix) => {

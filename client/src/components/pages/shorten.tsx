@@ -91,7 +91,7 @@ function Shorten() {
           </p>
         )}
       </motion.div>
-      <div className="p-4">
+      <div className="px-0 py-4 md:px-4">
         <Form {...urlForm}>
           <form onSubmit={urlForm.handleSubmit(onSubmit)} className="space-y-3">
             <FormField
@@ -107,9 +107,9 @@ function Shorten() {
                 </FormItem>
               )}
             />
-            <div className="pt-2 flex items-center gap-6">
-              <div className="flex items-center gap-6">
-                <Button type="submit" variant={"golang"} disabled={submitting}>
+            <div className="pt-2 flex items-center gap-6 flex-col-reverse md:flex-row">
+              <div className="flex w-full md:w-min justify-start md:justify-center items-center gap-6">
+                <Button type="submit" className={"w-full"} variant={"golang"} disabled={submitting}>
                   {submitting ? "SHORTENING" : "SHORTEN"}
                 </Button>
               </div>
@@ -124,13 +124,13 @@ function Shorten() {
                     className="flex gap-2 items-center cursor-pointer w-full flex-1 justify-center"
                   >
                     {copying ? (
-                      <p className="text-sm w-max text-center">
+                      <p className="text-xs sm:text-sm w-max text-center">
                         Copied to Clipboard
                       </p>
                     ) : (
                       <>
                         <p
-                          className="text-sm"
+                          className="text-xs sm:text-sm"
                           onClick={() => {
                             navigator.clipboard.writeText(shortenedURL);
                             setCopying(true);
@@ -140,7 +140,7 @@ function Shorten() {
                         <a
                           href={shortenedURL}
                           target="_blank"
-                          className="tracking-wider text-golang"
+                          className="tracking-wider text-golang text-xs sm:text-sm md:text-md"
                         >
                           {shortenedURL}
                         </a>

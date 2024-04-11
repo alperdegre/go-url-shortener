@@ -6,7 +6,7 @@ interface Props {
   className?: string;
 }
 function Container({ children, className }: Props) {
-  return <div className={cn("mx-auto w-3/4", className)}>
+  return <div className={cn("mx-auto w-[90%] md:w-3/4", className)}>
     {children}
   </div>;
 }

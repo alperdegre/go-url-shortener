@@ -2,7 +2,7 @@ import Container from "./container";
 
 function Footer() {
   return (
-    <footer className="w-full bg-slate-900 text-white text-sm fixed bottom-0 left-0">
+    <footer className="w-full bg-slate-900 text-white text-xs md:text-sm fixed bottom-0 left-0">
       <Container>
         <div className="flex justify-between py-4">
           <div className="flex items-center font-light gap-2">
