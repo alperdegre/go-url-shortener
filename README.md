@@ -1,10 +1,10 @@
-# GO URL SHORTENER
+# Go Url Shortener
 
 GO Url Shortener *- you guessed it -* a URL shortener made with Go.
 
 I wanted to learn Go so I decided to make a URL shortener with it as a first project.
 
-It uses React for frontend, PostgreSQL in a container as a DB and Go for the backend.
+It uses React for frontend, PostgreSQL as a DB and Go for the backend.
 
 ## Features
 
