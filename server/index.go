@@ -125,4 +125,3 @@ func AuthMiddleware(ctx *gin.Context) {
 	ctx.Set(constants.USER_KEY, uint(userId))
 	ctx.Next()
 }
-

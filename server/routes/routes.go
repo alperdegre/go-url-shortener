@@ -253,4 +253,3 @@ func (r *Router) createHash(url string) string {
 
 	return hash
 }
-

@@ -113,7 +113,7 @@ function Login() {
                 <FormItem className="space-y-0 h-[81px]">
                   <FormLabel className="pb-1">Password</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter a password" {...field} />
+                    <Input placeholder="Enter a password" type="password" {...field} />
                   </FormControl>
                   <FormMessage className="text-xs pl-2 py-1" />
                 </FormItem>
