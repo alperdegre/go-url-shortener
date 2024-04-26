@@ -14,8 +14,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { AuthContext } from "@/context/authContext";
-import { BASE_URL } from "@/lib/utils";
-import { APIError, UrlResponse } from "@/lib/types";
+import { APIError, Language, UrlResponse } from "@/lib/types";
+import { LangContext } from "@/context/langContext";
 
 const urlSchema = z.object({
   url: z.string().url({ message: "Please enter a valid URL" }),
@@ -33,6 +33,7 @@ function Shorten() {
   const [copying, setCopying] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { token } = useContext(AuthContext);
+  const { serverUrl, language } = useContext(LangContext);
 
   useEffect(() => {
     if (error) {
@@ -52,7 +53,7 @@ function Shorten() {
     if (!token) return;
 
     setSubmitting(true);
-    const response = await fetch(`${BASE_URL}/api/shorten`, {
+    const response = await fetch(`${serverUrl}/api/shorten`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,7 +67,7 @@ function Shorten() {
       setError(errResponse.error);
     } else {
       const data: UrlResponse = await response.json();
-      setShortenedURL(`${BASE_URL}/${data.url}`);
+      setShortenedURL(`${serverUrl}/${data.url}`);
     }
     setSubmitting(false);
   }
@@ -74,7 +75,7 @@ function Shorten() {
   return (
     <div className="flex flex-col gap-2">
       <h2 className="text-2xl font-normal tracking-wider">
-        SHORTEN A <span className="text-golang font-semibold">URL</span>
+        SHORTEN A <span className={`${language === Language.GO ? "text-golang" : "text-python"} font-semibold`}>URL</span>
       </h2>
       <motion.div
         key={error}
@@ -109,7 +110,7 @@ function Shorten() {
             />
             <div className="pt-2 flex items-center gap-6 flex-col-reverse md:flex-row">
               <div className="flex w-full md:w-min justify-start md:justify-center items-center gap-6">
-                <Button type="submit" className={"w-full"} variant={"golang"} disabled={submitting}>
+                <Button type="submit" className={"w-full"} variant={language === Language.GO ? "golang" : "python"} disabled={submitting}>
                   {submitting ? "SHORTENING" : "SHORTEN"}
                 </Button>
               </div>
@@ -140,7 +141,7 @@ function Shorten() {
                         <a
                           href={shortenedURL}
                           target="_blank"
-                          className="tracking-wider text-golang text-xs sm:text-sm md:text-md"
+                          className={`tracking-wider ${language === Language.GO ? "text-golang" : "text-python"} text-xs sm:text-sm md:text-md`}
                         >
                           {shortenedURL}
                         </a>

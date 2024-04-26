@@ -12,11 +12,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { APIError, TokenResponse } from "@/lib/types";
-import { BASE_URL } from "@/lib/utils";
+import { APIError, Language, TokenResponse } from "@/lib/types";
 import { motion } from "framer-motion";
 import { AuthContext } from "../../context/authContext";
 import { Link, useNavigate } from "react-router-dom";
+import { LangContext } from "@/context/langContext";
 
 const signUpSchema = z.object({
   username: z
@@ -39,6 +39,7 @@ function SignUp() {
   const { login } = useContext(AuthContext);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const { serverUrl, language } = useContext(LangContext);
 
   useEffect(() => {
     if (error) {
@@ -50,7 +51,7 @@ function SignUp() {
 
   async function onSubmit(values: z.infer<typeof signUpSchema>) {
     setSubmitting(true);
-    const response = await fetch(`${BASE_URL}/auth/signup`, {
+    const response = await fetch(`${serverUrl}/auth/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,12 +122,12 @@ function SignUp() {
             />
             <div className="pt-2 flex items-center justify-between">
               <div className="flex items-center gap-6">
-                <Button type="submit" variant={"golang"} disabled={submitting}>
+                <Button type="submit" variant={language === Language.GO ? "golang" : "python"} disabled={submitting}>
                   SIGN UP
                 </Button>
                 <p className="text-xs text-center">
                   Already have an account?{" "}
-                  <Link className="text-golang hover:underline" to="/login">
+                  <Link className={`${language === Language.GO ? "text-golang hover:go_underline" : "text-python hover:python_underline"} `} to="/login">
                     Login
                   </Link>
                 </p>

@@ -75,11 +75,44 @@
   }
 }
 
-.underline {
+.go_underline {
   position: absolute;
   bottom: -6px;
   left: 0;
   right: 0;
   height: 2px;
   background: #00add8;
+}
+
+.python_underline {
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #306998;
+}
+
+.switch {
+  width: 80px;
+  display: flex;
+  justify-content: flex-start;
+  border-radius: 50px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.switch[data-isOn="true"] {
+  justify-content: flex-end;
+}
+
+.handle {
+  width: 40px;
+  height: 40px;
+  background-color: #00add8;
+  border-radius: 40px;
+}
+
+.handle[data-isOn="true"] {
+  background-color: #306998;
 }

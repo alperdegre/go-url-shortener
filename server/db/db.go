@@ -136,4 +136,3 @@ func (db *DB) GetUserURLs(userID uint) ([]URL, error) {
 
 	return urls, nil
 }
-

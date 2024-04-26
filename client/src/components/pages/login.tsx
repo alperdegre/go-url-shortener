@@ -12,11 +12,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { APIError, TokenResponse } from "@/lib/types";
-import { BASE_URL } from "@/lib/utils";
+import { APIError, Language, TokenResponse } from "@/lib/types";
 import { motion } from "framer-motion";
 import { AuthContext } from "../../context/authContext";
 import { useNavigate } from "react-router-dom";
+import { LangContext } from "@/context/langContext";
 
 const loginSchema = z.object({
   username: z
@@ -39,6 +39,7 @@ function Login() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { serverUrl, language } = useContext(LangContext);
 
   useEffect(() => {
     if (error) {
@@ -50,7 +51,7 @@ function Login() {
 
   async function onSubmit(values: z.infer<typeof loginSchema>) {
     setSubmitting(true);
-    const response = await fetch(`${BASE_URL}/auth/login`, {
+    const response = await fetch(`${serverUrl}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -127,7 +128,7 @@ function Login() {
                 <p className="text-xs text-center">
                   Don't have an account?{" "}
                   <button
-                    className="text-golang hover:underline"
+                    className={`${language === Language.GO ? "text-golang hover:go_underline" : "text-python hover:python_underline"}`}
                     onClick={() => navigate("/signup")}
                     type="button"
                   >

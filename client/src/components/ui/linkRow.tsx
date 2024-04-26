@@ -1,10 +1,10 @@
-import { APIError, URL } from "@/lib/types";
-import { BASE_URL } from "@/lib/utils";
+import { APIError, Language, URL } from "@/lib/types";
 import { CopyIcon, Trash } from "lucide-react";
 import { useContext, useState } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "@/context/authContext";
+import { LangContext } from "@/context/langContext";
 
 interface Props {
   url: URL;
@@ -16,12 +16,13 @@ function LinkRow({ url, ix, onError }: Props) {
   const [copying, setCopying] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const { token } = useContext(AuthContext);
+  const { serverUrl, language } = useContext(LangContext);
 
   const handleDelete = async () => {
     if (!token) return;
     setDeleting(true);
 
-    const response = await fetch(`${BASE_URL}/api/delete/${url.ID}`, {
+    const response = await fetch(`${serverUrl}/api/delete/${url.ID}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -47,18 +48,18 @@ function LinkRow({ url, ix, onError }: Props) {
       >
         {deleting ? null : (
           <div
-            className={`flex w-full items-center justify-between py-1 rounded-md ${ix % 2 === 0 && "bg-golang/10"
+            className={`flex w-full items-center justify-between py-1 rounded-md ${ix % 2 === 0 && `${language === Language.GO ? "bg-golang/10" : "bg-python/10"}`
               }`}
           >
             <div className="w-[65%] md:w-[75%] flex items-center flex-col-reverse md:flex-row">
 
               <p className="w-full md:w-[50%] text-xs pl-2">{url.LongURL}</p>
               <a
-                href={`${BASE_URL}/${url.ShortURL}`}
+                href={`${serverUrl}/${url.ShortURL}`}
                 target="_blank"
-                className="w-full md:w-[50%] pl-2 md:pl-0 text-xs text-golang font-semibold"
+                className={`w-full md:w-[50%] pl-2 md:pl-0 text-xs ${language === Language.GO ? "text-golang" : "text-python"} font-semibold`}
               >
-                {BASE_URL}/{url.ShortURL}
+                {serverUrl}/{url.ShortURL}
               </a>
             </div>
             <div className="w-[35%] md:w-[25%] flex items-center">
@@ -78,12 +79,12 @@ function LinkRow({ url, ix, onError }: Props) {
                     onClick={() => {
                       setCopying(true);
                       navigator.clipboard.writeText(
-                        `${BASE_URL}/${url.ShortURL}`
+                        `${serverUrl}/${url.ShortURL}`
                       );
                       setTimeout(() => setCopying(false), 1000);
                     }}
                   >
-                    <CopyIcon className="w-4 h-4 group-hover:text-golang transition duration-300" />
+                    <CopyIcon className={`w-4 h-4 ${language === Language.GO ? "group-hover:text-golang" : "group-hover:text-python"} transition duration-300`} />
                   </p>
                 )}
               </motion.div>
@@ -91,7 +92,7 @@ function LinkRow({ url, ix, onError }: Props) {
                 className="w-full text-center flex items-center justify-center group cursor-pointer"
                 onClick={() => handleDelete()}
               >
-                <Trash className="w-4 h-4 group-hover:text-golang transition duration-300" />
+                <Trash className={`w-4 h-4 ${language === Language.GO ? "group-hover:text-golang" : "group-hover:text-python"} transition duration-300`} />
               </p>
             </div>
           </div>

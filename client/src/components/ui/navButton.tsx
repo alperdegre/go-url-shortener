@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
+import { Language } from "@/lib/types";
+import { LangContext } from "@/context/langContext";
 
 interface Props {
   to: string;
@@ -12,6 +14,7 @@ interface Props {
 function NavButton({ to, text, key }: Props) {
   const location = useLocation();
   const { loggingOut } = useContext(AuthContext);
+  const { language } = useContext(LangContext);
 
   return (
     <Link
@@ -21,7 +24,7 @@ function NavButton({ to, text, key }: Props) {
     >
       {text}
       {location.pathname === to && !loggingOut ? (
-        <motion.div className="underline" layoutId="underline" />
+        <motion.div className={language === Language.GO ? "go_underline" : "python_underline"} layoutId="underline" />
       ) : null}
     </Link>
   );

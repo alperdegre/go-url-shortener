@@ -1,7 +1,8 @@
 import { JWTExpiry, JWTToken, UserID } from "@/lib/types";
-import { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { PROTECTED_ROUTES } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";
+import { LangContext } from "./langContext";
 
 interface AuthContextType {
   token: JWTToken;
@@ -15,8 +16,8 @@ const AuthContext = createContext<AuthContextType>({
   token: null,
   userID: null,
   loggingOut: false,
-  login: () => {},
-  logout: () => {},
+  login: () => { },
+  logout: () => { },
 });
 
 interface AuthProviderProps {
@@ -29,9 +30,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loggingOut, setLoggingOut] = useState<boolean>(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { language } = useContext(LangContext);
 
   useEffect(() => {
-    const userData = localStorage.getItem("userData");
+    const userData = localStorage.getItem(`userData_${language}`);
     if (userData) {
       const parsedData = JSON.parse(userData);
       const remainingTime = parsedData.expiry - Math.floor(Date.now() / 1000);
@@ -65,13 +67,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = (token: JWTToken, userID: UserID, expiry: JWTExpiry) => {
     setToken(token);
     setUserID(userID);
-    localStorage.setItem("userData", JSON.stringify({ token, userID, expiry }));
+    localStorage.setItem(`userData_${language}`, JSON.stringify({ token, userID, expiry }));
   };
 
   const logout = useCallback(() => {
     setLoggingOut(true);
     setToken(null);
-    localStorage.removeItem("userData");
+    localStorage.removeItem(`userData_${language}`);
     setTimeout(() => {
       setLoggingOut(false);
       navigate("/");

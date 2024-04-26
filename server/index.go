@@ -14,6 +14,18 @@ import (
 	"strconv"
 )
 
+docker run -it --rm \
+     -v certbot:/etc/letsencrypt \
+     -v /var/lib/letsencrypt \
+     -p 80:80 \
+     --name certbot \
+     certbot/certbot certonly \
+     --standalone \
+     --preferred-challenges http \
+     --agree-tos \
+     --email alper.degre.dev@gmail.com \
+     -d short.alperdegre.com
+
 type App struct {
 	router routes.Router
 }

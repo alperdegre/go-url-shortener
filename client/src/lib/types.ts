@@ -6,6 +6,11 @@ export enum PageState {
   DASHBOARD,
 }
 
+export enum Language {
+  GO = "GO",
+  PYTHON = "PYTHON"
+}
+
 export type APIError = {
   error: string;
 };

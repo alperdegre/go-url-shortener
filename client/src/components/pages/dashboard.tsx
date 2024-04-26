@@ -1,19 +1,19 @@
 import { AuthContext } from "@/context/authContext";
-import { URL } from "@/lib/types";
-import { BASE_URL } from "@/lib/utils";
+import { Language, URL } from "@/lib/types";
 import { motion } from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import LinkRow from "../ui/linkRow";
+import { LangContext } from "@/context/langContext";
 
 function Dashboard() {
   const [urls, setURLs] = useState<URL[]>([]);
   const [error, setError] = useState("");
   const { token } = useContext(AuthContext);
-
+  const { serverUrl, language } = useContext(LangContext)
   useEffect(() => {
     async function fetchURLs() {
       if (!token) return;
-      const response = await fetch(`${BASE_URL}/api/get`, {
+      const response = await fetch(`${serverUrl}/api/get`, {
         method: "GET",
         headers: {
           Authorization: token,
@@ -42,7 +42,7 @@ function Dashboard() {
   return (
     <div className="flex flex-col gap-2">
       <h2 className="text-2xl font-normal tracking-wider">
-        YOUR <span className="text-golang font-semibold">SHORTENED</span> URLS
+        YOUR <span className={`${language === Language.GO ? "text-golang" : "text-python"} font-semibold`}>SHORTENED</span> URLS
       </h2>
       <motion.div
         key={error}
