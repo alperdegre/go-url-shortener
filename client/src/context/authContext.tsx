@@ -1,4 +1,4 @@
-import { JWTExpiry, JWTToken, UserID } from "@/lib/types";
+import { JWTExpiry, JWTToken, Language, UserID } from "@/lib/types";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { PROTECTED_ROUTES } from "@/lib/utils";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -33,7 +33,28 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const { language } = useContext(LangContext);
 
   useEffect(() => {
-    const userData = localStorage.getItem(`userData_${language}`);
+    checkAuth(language)
+  }, []);
+
+  useEffect(() => {
+    checkAuth(language)
+  }, [language])
+
+  useEffect(() => {
+    if (PROTECTED_ROUTES.includes(location.pathname) && !token) {
+      navigate("/");
+    }
+
+    if (
+      (location.pathname === "/login" || location.pathname === "/signup") &&
+      token
+    ) {
+      navigate("/dashboard");
+    }
+  }, [location.pathname, navigate, token]);
+
+  const checkAuth = (newLang: Language) => {
+    const userData = localStorage.getItem(`userData_${newLang}`);
     if (userData) {
       const parsedData = JSON.parse(userData);
       const remainingTime = parsedData.expiry - Math.floor(Date.now() / 1000);
@@ -48,21 +69,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
         return () => clearTimeout(timer);
       }
+    } else {
+      console.log("out")
+      if (PROTECTED_ROUTES.includes(location.pathname)) {
+        logout()
+      } else {
+        setToken(null)
+        setUserID(null)
+      }
     }
-  }, []);
-
-  useEffect(() => {
-    if (PROTECTED_ROUTES.includes(location.pathname) && !token) {
-      navigate("/");
-    }
-
-    if (
-      (location.pathname === "/login" || location.pathname === "/signup") &&
-      token
-    ) {
-      navigate("/dashboard");
-    }
-  }, [location.pathname, navigate, token]);
+  }
 
   const login = (token: JWTToken, userID: UserID, expiry: JWTExpiry) => {
     setToken(token);
@@ -78,7 +94,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       setLoggingOut(false);
       navigate("/");
       setUserID(null);
-    }, 1000);
+    }, 500);
   }, [navigate]);
 
   return (

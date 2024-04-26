@@ -125,9 +125,8 @@ func (db *DB) DeleteUrl(urlID string) error {
 }
 
 func (db *DB) GetUserURLs(userID uint) ([]URL, error) {
-	log.Printf("User Id From Func: %d ", userID)
 	var urls []URL
-	result := db.Pool.Find(&urls)
+	result := db.Pool.Where("user_id = ?", userID).Find(&urls)
 
 	if result.Error != nil {
 		log.Println(result.Error)

@@ -34,7 +34,7 @@ export type URL = {
   CreatedAt: string;
   LongURL: string;
   ShortURL: string;
-  User: User;
+  User?: User;
   UserID: number;
 };
 
@@ -46,3 +46,11 @@ export type User = {
   Username: string;
   Password: string;
 };
+
+export type PythonURL = {
+  id: number;
+  user_id: number;
+  long_url: string;
+  short_url: string;
+  created_at: string;
+}

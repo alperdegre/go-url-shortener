@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useContext, useEffect, useState } from "react";
 import LinkRow from "../ui/linkRow";
 import { LangContext } from "@/context/langContext";
+import { normalizePythonURLs } from "@/lib/utils";
 
 function Dashboard() {
   const [urls, setURLs] = useState<URL[]>([]);
@@ -25,7 +26,11 @@ function Dashboard() {
         setError(errResponse.error);
       } else {
         const urlsResponse = await response.json();
-        setURLs(urlsResponse.urls);
+        if (language === Language.PYTHON) {
+          setURLs(normalizePythonURLs(urlsResponse.urls))
+        } else {
+          setURLs(urlsResponse.urls);
+        }
       }
     }
     fetchURLs();
