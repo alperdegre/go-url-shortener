@@ -6,6 +6,8 @@ I wanted to learn Go so I decided to make a URL shortener with it as a first pro
 
 It uses React for frontend, PostgreSQL as a DB and Go for the backend.
 
+You can find a demo hosted at [https://short.alperdegre.com/](https://short.alperdegre.com/) that shares a frontend with [Python Shortener Backend](https://github.com/alperdegre/python-url-shortener)
+
 ## Features
 
 - Shorten URLs
