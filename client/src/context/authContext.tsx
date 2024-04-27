@@ -72,11 +72,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     } else {
       console.log("out")
       if (PROTECTED_ROUTES.includes(location.pathname)) {
-        logout()
-      } else {
-        setToken(null)
-        setUserID(null)
+        navigate("/")
       }
+      setToken(null)
+      setUserID(null)
     }
   }
 
